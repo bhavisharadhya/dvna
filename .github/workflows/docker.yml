@@ -26,19 +26,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
+          file: ./Dockerfile
           push: true
-          tags: your-dockerhub-username/your-repository:latest
-
-
-      - name: Deploy to Production
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: |
-          echo "Deploying to production..."
-          # Add deployment script or commands here
-
-    environment:
-      name: production
-      url: https://hub.docker.com/repository/docker/bhavishhu/github_test
+          tags: bhavishhu/github_test:latest
