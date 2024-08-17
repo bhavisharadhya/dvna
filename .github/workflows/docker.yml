@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
+      - name: Set up Docker Buildx Docker CLI Plugin
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Docker image
@@ -29,3 +29,15 @@ jobs:
           file: Dockerfile
           push: true
           tags: bhavishhu/github_test:latest
+
+      - name: Deploy to Production
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "Deploying to production..."
+          # Add deployment script or commands here
+
+    environment:
+      name: production
+      url: https://hub.docker.com/repository/docker/bhavishhu/github_test
