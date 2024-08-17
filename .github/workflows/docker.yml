@@ -16,4 +16,4 @@ jobs:
         uses: docker/build-push-action
         with:
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/clockbox:latest
+          tags: bhavishhu/github_test/clockbox:latest
