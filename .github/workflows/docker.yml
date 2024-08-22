@@ -86,11 +86,6 @@ jobs:
         with:
           sarif_file: trivy-report.sarif
 
-      - name: Upload Snyk SARIF report
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: snyk-report.sarif
-
       - name: Push Docker image if scan is successful
         if: success()
         run: |
