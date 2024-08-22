@@ -16,6 +16,7 @@ permissions:
 jobs:
   build_and_scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,8 +44,7 @@ jobs:
           echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           echo "IMAGE_SHA=$IMAGE_SHA" >> $GITHUB_ENV
-          docker inspect --format='{{index .Id}}' $IMAGE_ID:$IMAGE_TAG
-        
+
       - name: Install Trivy
         run: |
           sudo apt-get update -y
@@ -65,35 +65,54 @@ jobs:
 
       - name: Run Snyk to check for vulnerabilities
         run: |
-         snyk container test $IMAGE_ID:$IMAGE_TAG --severity-threshold=high --sarif > snyk-container-report.sarif || (cat snyk-container-report.sarif && echo "Snyk test failed with exit code $?")
+          snyk container test $IMAGE_ID:$IMAGE_TAG --severity-threshold=high --sarif > snyk-container-report.sarif || (cat snyk-container-report.sarif && echo "Snyk test failed with exit code $?")
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Validate SARIF report
+      - name: Validate Snyk SARIF report
         run: |
-          jq . snyk-report.sarif || echo "Invalid SARIF report"
+          jq . snyk-container-report.sarif || echo "Invalid Snyk SARIF report"
 
       - name: Upload Snyk SARIF report
         uses: actions/upload-artifact@v3
         with:
-          name: snyk-report
-          path: snyk-report.sarif
+          name: snyk-container-report
+          path: snyk-container-report.sarif
 
-      - name: Upload Snyk SARIF report
+      - name: Upload Snyk SARIF report to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: snyk-container-report.sarif          
+          sarif_file: snyk-container-report.sarif
 
-      - name: Scan Docker image for vulnerabilities
+      - name: Scan Docker image for vulnerabilities with Trivy
         run: |
-          IMAGE_SHA=${{ env.image_sha }}
+          IMAGE_SHA=${{ env.IMAGE_SHA }}
           echo "Scanning Docker image with SHA: $IMAGE_SHA"
           trivy image --severity HIGH,CRITICAL $IMAGE_SHA --format sarif --output trivy-report.sarif
-          
+
       - name: Upload Trivy SARIF report
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-report.sarif  
+          sarif_file: trivy-report.sarif
+
+      - name: Set up ShiftLeft CLI
+        run: |
+          # Download and install ShiftLeft CLI
+          curl -L -o shiftleft-cli.tar.gz https://download.shiftleft.io/cli/latest/shiftleft-cli-linux-x64.tar.gz
+          tar -xzf shiftleft-cli.tar.gz
+          chmod +x shiftleft
+          sudo mv shiftleft /usr/local/bin/shiftleft
+
+      - name: Run ShiftLeft Scan
+        run: |
+          # Run the ShiftLeft scan
+          shiftleft scan --project your-project-name --format json --output /path/to/report.json
+
+      - name: Upload ShiftLeft Scan Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: shiftleft-scan-report
+          path: /path/to/report.json
 
       - name: Push Docker image if scan is successful
         if: success()
