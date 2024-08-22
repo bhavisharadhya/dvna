@@ -52,6 +52,14 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: trivy-report.sarif
+
+      - name: Install and Run Snyk
+         run: |
+          npm install -g snyk
+          snyk test
+          snyk monitor
+       env:
+         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           
      
       - name: Push Docker image if scan is successful
