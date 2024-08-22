@@ -75,6 +75,11 @@ jobs:
           name: snyk-report
           path: snyk-report.sarif
 
+      - name: Upload Snyk SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-report.sarif          
+
       - name: Scan Docker image for vulnerabilities
         run: |
           IMAGE_SHA=${{ env.image_sha }}
