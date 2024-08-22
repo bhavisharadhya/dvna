@@ -11,6 +11,7 @@ permissions:
   contents: read
   packages: write
   actions: read
+  security-events: write  # Required for uploading SARIF results
 
 jobs:
   build_and_scan:
@@ -65,7 +66,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload Snyk report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: snyk-report
           path: snyk-report.json
@@ -81,10 +82,10 @@ jobs:
         with:
           sarif_file: trivy-report.sarif
 
-      - name: Upload Trivy SARIF report
+      - name: Upload Snyk SARIF report
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: snyk-report.sarif          
+          sarif_file: snyk-report.sarif
 
       - name: Push Docker image if scan is successful
         if: success()
