@@ -54,7 +54,7 @@ jobs:
           sarif_file: trivy-report.sarif
 
       - name: Install and Run Snyk
-         run: |
+        run: |
           npm install -g snyk
           snyk test
           snyk monitor
