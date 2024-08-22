@@ -47,6 +47,12 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/download/v0.30.0/trivy_0.30.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.30.0_Linux-64bit.deb
 
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/action@v2
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - name: Scan Docker image for vulnerabilities
         run: |
           IMAGE_SHA=${{ env.image_sha }}
@@ -57,13 +63,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: trivy-report.sarif
-
-      - uses: actions/checkout@master
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven@master
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Push Docker image if scan is successful
         if: success()
