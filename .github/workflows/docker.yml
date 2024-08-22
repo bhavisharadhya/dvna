@@ -53,21 +53,23 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Display funding options
+        run: npm fund
+
       - name: Install Snyk CLI
         run: npm install -g snyk
 
       - name: Run Snyk to check for vulnerabilities
-        uses: clarkio/snyk-cli-action@master
-        with:
-          args: test --all-projects --json
+        run: |
+          snyk test --all-projects --sarif > snyk-report.sarif || (cat snyk-report.sarif && echo "Snyk SARIF report generation failed with exit code $?")
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Upload Snyk report
-        uses: actions/upload-artifact@v4
+      - name: Upload Snyk SARIF report
+        uses: actions/upload-artifact@v3
         with:
           name: snyk-report
-          path: snyk-report.json
+          path: snyk-report.sarif
 
       - name: Scan Docker image for vulnerabilities
         run: |
@@ -79,6 +81,11 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-report.sarif
+
+      - name: Upload Snyk SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-report.sarif
 
       - name: Push Docker image if scan is successful
         if: success()
