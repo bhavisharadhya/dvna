@@ -103,15 +103,16 @@ jobs:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v1
+      - name: Upload ShiftLeft Security Reports
+        uses: actions/upload-artifact@v3
         with:
-         name: shiftleft-reports
-         path: reports
+          name: shiftleft-reports
+          path: reports
 
       - name: Upload shiftleft SARIF report
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: report.sarif         
+          sarif_file: reports/shiftleft-report.sarif         
 
       - name: Push Docker image if scan is successful
         if: success()
