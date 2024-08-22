@@ -61,7 +61,7 @@ jobs:
 
       - name: Run Snyk to check for vulnerabilities
         run: |
-          snyk test --all-projects --sarif > snyk-report.sarif || (cat snyk-report.sarif && echo "Snyk SARIF report generation failed with exit code $?")
+          snyk container test $IMAGE_SHA --severity-threshold=high --json > snyk-report.json
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -76,8 +76,7 @@ jobs:
           IMAGE_SHA=${{ env.image_sha }}
           echo "Scanning Docker image with SHA: $IMAGE_SHA"
           trivy image --severity HIGH,CRITICAL $IMAGE_SHA --format sarif --output trivy-report.sarif
-          snyk container test $IMAGE_SHA --severity-threshold=high --json > snyk-report.json
-
+          
       - name: Upload Trivy SARIF report
         uses: github/codeql-action/upload-sarif@v3
         with:
