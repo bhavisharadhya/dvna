@@ -71,6 +71,8 @@ jobs:
 
       - name: checking snyk sarif        
         run: snyk test --all-projects --sarif-file-output=snyk-report.sarif
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload Snyk SARIF report
         uses: actions/upload-artifact@v3
