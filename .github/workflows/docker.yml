@@ -98,7 +98,7 @@ jobs:
       - name: Perform Scan
         uses: ShiftLeftSecurity/scan-action@master
         with:
-         type: "credscan,python,java"
+         type: "credscan,python,javascript,shell"
         env:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
          name: shiftleft-reports
-         path: shiftleft-reports
+         path: reports
 
       - name: Upload shiftleft SARIF report
         uses: github/codeql-action/upload-sarif@v3
