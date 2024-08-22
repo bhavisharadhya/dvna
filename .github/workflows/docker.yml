@@ -61,8 +61,13 @@ jobs:
 
       - name: Run Snyk to check for vulnerabilities
         run: |
-          snyk container test $IMAGE_SHA --severity-threshold=high --sarif > snyk-report.sarif || (cat snyk-report.sarif && echo "Snyk test failed with exit code $?")
-          snyk test --all-projects --sarif-file-output=snyk-report.sarif 
+         snyk container test $IMAGE_SHA --severity-threshold=high --sarif > snyk-container-report.sarif || (cat snyk-container-report.sarif && echo "Snyk container test failed with exit code $?")
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk to check all projects
+        run: |
+         snyk test --all-projects --sarif-file-output=snyk-project-report.sarif || (cat snyk-project-report.sarif && echo "Snyk project test failed with exit code $?")
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
