@@ -62,17 +62,13 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         run: |
           snyk container test $IMAGE_SHA --severity-threshold=high --sarif > snyk-report.sarif || (cat snyk-report.sarif && echo "Snyk test failed with exit code $?")
+          snyk test --all-projects --sarif-file-output=snyk-report.sarif 
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Validate SARIF report
         run: |
           jq . snyk-report.sarif || echo "Invalid SARIF report"
-
-      - name: checking snyk sarif        
-        run: snyk test --all-projects --sarif-file-output=snyk-report.sarif
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Upload Snyk SARIF report
         uses: actions/upload-artifact@v3
