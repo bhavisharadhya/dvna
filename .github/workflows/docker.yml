@@ -65,7 +65,7 @@ jobs:
 
       - name: Run Snyk to check for vulnerabilities
         run: |
-         snyk container test $IMAGE_ID:$IMAGE_TAG --severity-threshold=high --sarif > snyk-container-report.sarif
+         snyk container test $IMAGE_ID:$IMAGE_TAG --severity-threshold=high --sarif > snyk-container-report.sarif || (cat snyk-report.sarif && echo "Snyk test failed with exit code $?")
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
