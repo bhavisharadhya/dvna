@@ -65,6 +65,10 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: Validate SARIF report
+        run: |
+          jq . snyk-report.sarif || echo "Invalid SARIF report"
+
       - name: Upload Snyk SARIF report
         uses: actions/upload-artifact@v3
         with:
