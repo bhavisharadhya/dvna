@@ -51,12 +51,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Clear npm cache
-        run: npm cache clean --force
-
-      - name: Update dependencies
-        run: npm update
-
       - name: Display funding options
         run: npm fund
 
