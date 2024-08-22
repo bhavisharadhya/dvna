@@ -98,15 +98,20 @@ jobs:
       - name: Perform Scan
         uses: ShiftLeftSecurity/scan-action@master
         with:
-         type: "credscan,python"
+         type: "credscan,python,java"
         env:
           WORKSPACE: https://github.com/${{ github.repository }}/blob/${{ github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v1
         with:
-         name: reports
-         path: reports
+         name: shiftleft-reports
+         path: shiftleft-reports
+
+      - name: Upload shiftleft SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: shiftleft-report.sarif         
 
       - name: Push Docker image if scan is successful
         if: success()
