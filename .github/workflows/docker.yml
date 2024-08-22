@@ -62,10 +62,7 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         run: |
           snyk test --all-projects --sarif > snyk-report.sarif || (cat snyk-report.sarif && echo "Snyk SARIF report generation failed with exit code $?")
-        with:
-          go-version: '1.13'
-      - name: Snyk monitor
-        run: snyk test
+          snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
