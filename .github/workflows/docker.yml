@@ -68,6 +68,10 @@ jobs:
       - name: Validate SARIF report
         run: |
           jq . snyk-report.sarif || echo "Invalid SARIF report"
+                - name: Generate Snyk SARIF Report
+
+      - name: checking snyk sarif        
+        run: snyk test --all-projects --sarif-file-output=snyk-report.sarif
 
       - name: Upload Snyk SARIF report
         uses: actions/upload-artifact@v3
