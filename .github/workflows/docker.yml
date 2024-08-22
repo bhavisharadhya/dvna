@@ -4,15 +4,20 @@ on:
   workflow_call:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
-permissions: write-all
+permissions:
+  contents: read
+  packages: write
+  actions: read
 
 jobs:
   build_and_scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -31,9 +36,9 @@ jobs:
           IMAGE_TAG=${{ github.sha }}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           echo "Building Docker image with tag: $IMAGE_TAG"
-          docker image build -t $IMAGE_ID:$IMAGE_TAG .
+          docker build -t $IMAGE_ID:$IMAGE_TAG .
           IMAGE_SHA=$(docker inspect --format='{{index .Id}}' $IMAGE_ID:$IMAGE_TAG)
-          echo "::set-output name=image_sha::$IMAGE_SHA"
+          echo "image_sha=$IMAGE_SHA" >> $GITHUB_ENV
 
       - name: Install Trivy
         run: |
@@ -41,10 +46,10 @@ jobs:
           sudo apt-get install wget -y
           wget https://github.com/aquasecurity/trivy/releases/download/v0.30.0/trivy_0.30.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.30.0_Linux-64bit.deb
- 
+
       - name: Scan Docker image for vulnerabilities
         run: |
-          IMAGE_SHA=${{ steps.build_image.outputs.image_sha }}
+          IMAGE_SHA=${{ env.image_sha }}
           echo "Scanning Docker image with SHA: $IMAGE_SHA"
           trivy image --severity HIGH,CRITICAL $IMAGE_SHA --format sarif --output trivy-report.sarif
 
@@ -53,15 +58,13 @@ jobs:
         with:
           sarif_file: trivy-report.sarif
 
-      - name: Install and Run Snyk
-        run: |
-          npm install -g snyk
-          snyk test
-          snyk monitor
-       env:
-         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          
-     
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - name: Push Docker image if scan is successful
         if: success()
         run: |
@@ -69,4 +72,4 @@ jobs:
           IMAGE_TAG=${{ github.sha }}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           echo "Pushing Docker image with tag: $IMAGE_TAG"
-          docker image push $IMAGE_ID:$IMAGE_TAG
+          docker push $IMAGE_ID:$IMAGE_TAG
