@@ -122,11 +122,18 @@ jobs:
             echo "ShiftLeft report not found."
           fi 
 
-      - name: Upload ShiftLeft Scan Report
+            # Check the exit code of the scan action
+          if [ $? -ne 0 ]; then
+            echo "ShiftLeft scan failed with exit code $?"
+            exit 1
+          fi
+
+      - name: Upload SARIF Report
+        if: success()  # Only runs if previous steps succeed
         uses: actions/upload-artifact@v3
         with:
           name: shiftleft-scan-report
-          path: /path/to/report.sarif
+          path: ./report.sarif
 
       - name: Push Docker image if scan is successful
         if: success()
