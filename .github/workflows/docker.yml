@@ -95,11 +95,11 @@ jobs:
         with:
           sarif_file: trivy-report.sarif
 
-    - name: Set up ShiftLeft CLI
-      run: |
-        # Download and install ShiftLeft CLI
-        curl -L -o /usr/local/bin/sl https://cdn.shiftleft.io/download/sl
-        chmod a+rx /usr/local/bin/sl
+      - name: Set up ShiftLeft CLI
+        run: |
+          # Download and install ShiftLeft CLI
+          curl -L -o /usr/local/bin/sl https://cdn.shiftleft.io/download/sl
+          chmod a+rx /usr/local/bin/sl
 
       - name: Run ShiftLeft Scan
         run: |
