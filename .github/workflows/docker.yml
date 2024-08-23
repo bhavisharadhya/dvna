@@ -101,16 +101,28 @@ jobs:
           curl -L -o /usr/local/bin/sl https://cdn.shiftleft.io/download/sl
           chmod a+rx /usr/local/bin/sl
 
-      - name: Run ShiftLeft Scan
+      - name: Run ShiftLeft scan
         run: |
-          # Run the ShiftLeft scan
-          sl scan --project dvna --format json --output /path/to/report.json
+          shiftleft scan \
+            --org ${{ secrets.SHIFTLEFT_ORG_ID }} \
+            --access-token ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }} \
+            --api-token ${{ secrets.SHIFTLEFT_API_TOKEN }} \
+            --type container \
+            --app my-app \
+            --team my-team \
+            --force \
+            --wait \
+            $IMAGE_ID:$IMAGE_TAG
+        env:
+          SHIFTLEFT_ORG_ID: ${{ secrets.SHIFTLEFT_ORG_ID }}
+          SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
+          SHIFTLEFT_API_TOKEN: ${{ secrets.SHIFTLEFT_API_TOKEN }}
 
       - name: Upload ShiftLeft Scan Report
         uses: actions/upload-artifact@v3
         with:
           name: shiftleft-scan-report
-          path: /path/to/report.json
+          path: /path/to/report.sarif
 
       - name: Push Docker image if scan is successful
         if: success()
