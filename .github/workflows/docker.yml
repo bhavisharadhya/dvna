@@ -104,7 +104,7 @@ jobs:
       - name: Run ShiftLeft Scan
         run: |
           # Run the ShiftLeft scan
-          shiftleft scan --project your-project-name --format json --output /path/to/report.json
+          sl scan --project dvna --format json --output /path/to/report.json
 
       - name: Upload ShiftLeft Scan Report
         uses: actions/upload-artifact@v3
