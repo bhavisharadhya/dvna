@@ -98,8 +98,7 @@ jobs:
       - name: Set up ShiftLeft CLI
         run: |
           # Download and install ShiftLeft CLI
-          curl -L -o shiftleft-cli.tar.gz https://download.shiftleft.io/cli/latest/shiftleft-cli-linux-x64.tar.gz
-          tar -xzf shiftleft-cli.tar.gz
+          curl https://cdn.shiftleft.io/download/sl >/usr/local/bin/sl && chmod a+rx /usr/local/bin/sl
           chmod +x shiftleft
           sudo mv shiftleft /usr/local/bin/shiftleft
 
