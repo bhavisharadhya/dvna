@@ -103,7 +103,7 @@ jobs:
 
       - name: Run ShiftLeft scan
         run: |
-          shiftleft scan \
+          sl-latest scan \
             --org ${{ secrets.SHIFTLEFT_ORG_ID }} \
             --access-token ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }} \
             --api-token ${{ secrets.SHIFTLEFT_API_TOKEN }} \
