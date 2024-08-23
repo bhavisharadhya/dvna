@@ -1,0 +1,40 @@
+name: Code Security CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  scan_code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Run Snyk Code Scan
+        run: |
+          snyk test --all-projects --json > snyk-code-report.json || (cat snyk-code-report.json && echo "Snyk test failed with exit code $?")
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk Code Scan Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: snyk-code-results
+          path: snyk-code-report.json
