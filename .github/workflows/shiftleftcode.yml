@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Perform Scan
-      uses: ShiftLeftSecurity/scan-action@master"
+      uses: ShiftLeftSecurity/scan-action@master
       env:
         WORKSPACE: ""
         GITHUB_TOKEN: ${{ secrets.BEASTSPY}}
